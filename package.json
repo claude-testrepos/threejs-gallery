@@ -1,0 +1,14 @@
+{
+  "name": "metaverse-gallery",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "three": "^0.134.0"
+  },
+  "devDependencies": {
+    "vite": "^2.6.14"
+  }
+}
