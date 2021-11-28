@@ -32,7 +32,7 @@ export function buildRoom(scene, { width = 20, depth = 30, height = 5 } = {}) {
   return meshes;
 }
 
-export function hangPainting(scene, url, { x, z, rotY }) {
+export function hangPainting(scene, url, { x, z, rotY, title }) {
   const tex = new THREE.TextureLoader().load(url);
   const frame = new THREE.Mesh(
     new THREE.BoxGeometry(3.2, 2.2, 0.1),
@@ -43,5 +43,7 @@ export function hangPainting(scene, url, { x, z, rotY }) {
   frame.add(art);
   frame.position.set(x, 2.2, z);
   frame.rotation.y = rotY;
+  frame.userData.title = title;
   scene.add(frame);
+  return frame;
 }
