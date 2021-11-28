@@ -28,6 +28,7 @@ addEventListener("keydown", (e) => (keys[e.code] = true));
 addEventListener("keyup", (e) => (keys[e.code] = false));
 
 const clock = new THREE.Clock();
+const BOUNDS = { x: 9.3, z: 14.3 };
 
 renderer.setAnimationLoop(() => {
   const dt = clock.getDelta();
@@ -37,6 +38,9 @@ renderer.setAnimationLoop(() => {
     if (keys.KeyS) controls.moveForward(-speed);
     if (keys.KeyA) controls.moveRight(-speed);
     if (keys.KeyD) controls.moveRight(speed);
+    const p = camera.position;
+    p.x = THREE.MathUtils.clamp(p.x, -BOUNDS.x, BOUNDS.x);
+    p.z = THREE.MathUtils.clamp(p.z, -BOUNDS.z, BOUNDS.z);
   }
   renderer.render(scene, camera);
 });
