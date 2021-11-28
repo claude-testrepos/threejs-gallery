@@ -1,16 +1,48 @@
 import * as THREE from "three";
+import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
+import { buildRoom, hangPainting } from "./room.js";
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, 0.1, 100);
+scene.background = new THREE.Color(0x111111);
+const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(0, 1.7, 12);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(innerWidth, innerHeight);
 document.body.appendChild(renderer.domElement);
 
-const cube = new THREE.Mesh(new THREE.BoxGeometry(), new THREE.MeshNormalMaterial());
-scene.add(cube);
-camera.position.z = 3;
+buildRoom(scene);
+const paintings = Array.from({ length: 8 }, (_, i) => `/art/${i + 1}.jpg`);
+paintings.forEach((url, i) => {
+  const left = i % 2 === 0;
+  hangPainting(scene, url, { x: left ? -9.9 : 9.9, z: -12 + Math.floor(i / 2) * 7, rotY: left ? Math.PI / 2 : -Math.PI / 2 });
+});
+
+const controls = new PointerLockControls(camera, document.body);
+const overlay = document.getElementById("overlay");
+overlay.addEventListener("click", () => controls.lock());
+controls.addEventListener("lock", () => (overlay.style.display = "none"));
+controls.addEventListener("unlock", () => (overlay.style.display = "flex"));
+
+const keys = {};
+addEventListener("keydown", (e) => (keys[e.code] = true));
+addEventListener("keyup", (e) => (keys[e.code] = false));
+
+const clock = new THREE.Clock();
 
 renderer.setAnimationLoop(() => {
-  cube.rotation.y += 0.01;
+  const dt = clock.getDelta();
+  if (controls.isLocked) {
+    const speed = (keys.ShiftLeft ? 6 : 3) * dt;
+    if (keys.KeyW) controls.moveForward(speed);
+    if (keys.KeyS) controls.moveForward(-speed);
+    if (keys.KeyA) controls.moveRight(-speed);
+    if (keys.KeyD) controls.moveRight(speed);
+  }
   renderer.render(scene, camera);
+});
+
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
 });
